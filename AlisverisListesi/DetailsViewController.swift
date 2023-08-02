@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CoreData
 
 class DetailsViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
@@ -46,5 +47,36 @@ class DetailsViewController: UIViewController, UIImagePickerControllerDelegate, 
     }
     
     @IBAction func kaydetButtonTiklandi(_ sender: Any) {
+        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let context = appDelegate.persistentContainer.viewContext
+        
+        let alisveris = NSEntityDescription.insertNewObject(forEntityName: "Alisveris", into: context)
+        
+        alisveris.setValue(isimTextField.text!, forKey: "isim")
+        alisveris.setValue(bedenTextField.text!, forKey: "beden")
+        
+        if let fiyat = Int(fiyatTextField.text!) {
+            alisveris.setValue(fiyat, forKey: "fiyat")
+        }
+        
+        //universal unique id
+        alisveris.setValue(UUID(), forKey: "id")
+        let data = imageView.image!.jpegData(compressionQuality: 0.5)
+        
+        alisveris.setValue(data, forKey: "gorsel")
+        
+        do {
+            try context.save()
+            print("Kayıtedildi.")
+        } catch {
+            print("Hata var!")
+        }
+        
+        NotificationCenter.default.post(name: NSNotification.Name(rawValue: "veriGirildi"), object: nil)
+        self.navigationController?.popViewController(animated: true)
+        
+        
+        
     }
 }
